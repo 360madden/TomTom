@@ -1,0 +1,32 @@
+Identifier = "TomTom"
+Name = "TomTom"
+NameShort = "TomTom"
+Description = {
+	English = "Mark waypoints and find back to them",
+	German = "Wegpunkt-Markierer",
+	French = "...",
+}
+Author = "Wym"
+Website = "none"
+Version = "0.22"
+Email = "blohm@s.netic.de"
+Environment = {"2.3"}
+RunOnStartup = {
+	"Translations.lua",
+	"main.lua",
+	"TomTomUI.lua",
+	"TomTomAchv.lua",
+	"TomTomPortal.lua",
+	"TomTom_Summerfest.lua",
+}
+SavedVariables = {
+	TomTomChar = 'character',
+	TomTomShard = 'shard',
+	TomTomGlobal = 'global',
+}
+Embed = {
+	LibVersionCheck = true,
+}
+Dependencies = {
+	LibVersionCheck = {"required", "before"},
+};

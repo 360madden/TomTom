@@ -1,0 +1,57 @@
+Changes in 0.07:
+
+Fixed a bug when using /tomtom raredar without RareDar installed.
+
+Added portal locations for Telara (pre-SL) and the Dendrome (from PTS)
+
+If not routing anywhere, TomTom shows your walking/riding speed now.
+
+Changes in 0.06:
+
+Implemented /tomtom hide, /tomtom show and /tomtom autohide.
+
+Changes in 0.05:
+
+TomTom now knows about the location of Portals and Achievements (SL only as of now, classic to be added later). Use "/tomtom portals" if you level a new toon to 60 and just can't remember where the Ashora portals are. Use "/tomtom achieves" to get waypoints of the achievements you're missing.
+
+TomTom now has a menu now that allows you to quickly set routes to the most important stuff - ore, wood, plants, artifacts, achievements and portals, and rare mobs (if you have RareDar oder RareNerd installed).
+
+Changes in 0.04:
+
+Picking up items that have no item category (like the carnival crafting stuff), as well as using "/tomtom mark" without a marker name, shouldn't produce errors anymore.
+
+
+Changes in 0.03:
+
+/tomtom prev and /tomtom next work now instead of throwing errors
+
+/tomtom raredar doesnt throw errors anymore if you use it in zones like sanctum or meridian that have no rares
+
+hopefully fixed a bug that was reported through the email system but that i don't really understand (shouldn't happen ...)
+
+
+Changes in version 0.02:
+
+bump version number
+
+implement /tomtom forget to forget everything about the location you're at
+
+try harder not to remember bogus locations:
+
+- only track bag changes, no bank anymore
+
+- don't track grey items
+
+- don't track item swaps in bags
+
+implement /tomtom verbose to see status information while collecting stuff (use /tomtom silent to turn off)
+
+emit a usage string if some gives no / bad options
+
+allow quotes in arguments
+
+also track item types, to allow for /tomtom route "misc collectible" or /tomtom route "crafting material metal"
+
+increment window height a bit to have space for second row of information
+
+make /tomtom raredar route only mobs you haven't found/killed yet

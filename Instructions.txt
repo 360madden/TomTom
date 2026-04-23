@@ -1,0 +1,35 @@
+INTRODUCTION
+
+TomTom helps you to visit a series of waypoints in an effective way. This can be spawn points of crafting resources where you've picked up stuff before, rare mob locations, or positions you marked manually.
+
+When TomTom loads, it will show you a window with a green dot in it, and a + and a - sign.
+
+GETTING STARTED
+
+When you use TomTom for the first time, you won't have any meaningful waypoints yet. Ride around for a while, picking up stuff, to create a list. Then, use, for example, "/tomtom route lindenwood". TomTom will remember where you harvested lindenwood, create a route that visits all these waypoints.
+
+Or, if you have RareDar installed, use "/tomtom raredar". TomTom will create a route visiting all the rare mob locations of the zone you're in.
+
+As soon as a route exists, TomTom replaces the green dot with an arrow pointing to the first of them. Also, it will show you the distance to it. When you approach the shown location, the distance and the arrow will be updated continuously. As soon as you reach the position (come within 10 metres of it), TomTom switches to the next waypoint. When you reach the last waypoint, the arrow will be replaced by the green dot again.
+
+COMMANDS
+
+Pressing the "+" and "-" buttons switches to the previous/next waypoint in your list. So, when you're within 50 yards of your waypoint, and have decided you won't need to get closer, because the mob/node/whatever isn't there, you can switch to the next waypoint without needing to really visit the current one.
+
+/tomtom next will do the same. /tomtom prev or /tomtom previous will go one waypoint back in your list.
+
+/tomtom mark scenicroute will add your current position to a waypoint list named "scenicroute"; use /tomtom route scenicroute later to visit all of these waypoints. Or, use "/tomtom mark <list name> <xcoord> <ycoord> <comment>" repeatedly to mark several points, then "/tomtom route <list name>" to visit all of them. NOTE all of these have to be in your current zone.
+
+CAVEATS
+
+Tomtom will only consider waypoints in the zone you're in. So if you've been harvesting in ashora, and use "tomtom route ..." in the city core, it will only show nodes you've discovered there instead of sending you all over the map.
+
+Tomtom marks locations wherever you pick up something. So if your guildie hands over a stack of ore to you somewhere, tomtom will (falsely) remember this point as an ore node.
+
+Porting makes the game send "pickup" messages about everything in your inventory to addons, so whenever you port somewhere, this location will also be marked.
+
+TomTom doesn't know about hills and mobs, so the routes it creates for you won't always be "best" in "real world" situations.
+
+Creating the "best route possible" would be much more time-consuming than possible in an addon, so TomTom uses a "try to enter each new waypoint where it hurts least" algorithm. This will generally lead to a good, but not the very best possible, route.
+
+I would love to set real rift waypoints on the minimap, but there's currently no way to do this.
