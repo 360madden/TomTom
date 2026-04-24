@@ -6,10 +6,41 @@ if TomTom then
 end
 
 TomTom = {
-	version=TomTomAddonData.toc.Version
+	version=TomTomAddonData.toc.Version,
+	localPatch="debug-guard-20260423"
 }
 
 local function L(x) return Translations.TomTom.L(x) end
+
+local function tableLength(t)
+	if table.getn then return table.getn(t) end
+	return #t
+end
+
+local function atan2(y, x)
+	if math.atan2 then return math.atan2(y, x) end
+	if x > 0 then return math.atan(y / x) end
+	if x < 0 and y >= 0 then return math.atan(y / x) + math.pi end
+	if x < 0 and y < 0 then return math.atan(y / x) - math.pi end
+	if x == 0 and y > 0 then return math.pi / 2 end
+	if x == 0 and y < 0 then return -math.pi / 2 end
+	return 0
+end
+
+local debugEnabled=false
+local debugNextTime=0
+local debugUpdateCount=0
+local debugLastMessage=""
+local function debugPrint(message, force)
+	if not debugEnabled then return end
+	local now=Inspect.Time.Frame()
+	if force or now>=debugNextTime or message~=debugLastMessage then
+		print("[TomTom debug] "..message)
+		debugNextTime=now+2
+		debugLastMessage=message
+	end
+end
+
 
 local function ensureVariablesInited()
 	if not TomTomChar then TomTomChar={} end	
@@ -141,8 +172,8 @@ local nextroutingpoint=1
 local function flip(n)
 	nextroutingpoint=nextroutingpoint+n
 	if nextroutingpoint<1 then nextroutingpoint=1 end
-	if nextroutingpoint>table.getn(routingPoints) then
-		nextroutingpoint=table.getn(routingPoints)+1
+	if nextroutingpoint>tableLength(routingPoints) then
+		nextroutingpoint=tableLength(routingPoints)+1
 		TomTom.setInfoWindowText("TomTom")
 		TomTom.setInfoWindowDirection("nodir")
 	end
@@ -181,7 +212,7 @@ local function addRouting(str)
 				local dx1=x-p[1]
 				local dz1=z-p[2]
 				local dist1=math.sqrt(dx1*dx1+dz1*dz1)
-				if i==table.getn(routingPoints) then
+				if i==tableLength(routingPoints) then
 					currentcost=dist1
 				else
 					local dx2=x-routingPoints[i+1][1];
@@ -199,7 +230,7 @@ local function addRouting(str)
 					bestbehind=i
 				end
 			end
-			i=table.getn(routingPoints)
+			i=tableLength(routingPoints)
 			while (i>bestbehind) do
 				routingPoints[i+1]=routingPoints[i]
 				i=i-1
@@ -361,7 +392,7 @@ function TomTom.routePortals()
 end
 
 local tmpFlag=false
-local crashedinUpdate=false
+local crashedInUpdate=false
 local lastTime=0
 local lastX=0
 local lastZ=0
@@ -370,7 +401,8 @@ local lastspX=0
 local lastspZ=0
 local speed=0
 
-local function systemUpdate(handle)
+local function systemUpdateCore(handle)
+	debugUpdateCount=debugUpdateCount+1
 	if tmpFlag == true then return end
 	if crashedInUpdate == true then return end
 	crashedInUpdate = true
@@ -381,6 +413,7 @@ local function systemUpdate(handle)
 
 	local playerdetail=Inspect.Unit.Detail("player")
 	if playerdetail == nil or playerdetail.coordX == nil then
+		debugPrint("update #"..debugUpdateCount..": waiting for player coordinates")
 		-- happens during ports
 		crashedInUpdate = false
 		return
@@ -402,7 +435,7 @@ local function systemUpdate(handle)
 		lastTime=now
 	end
 
-	if nextroutingpoint <= table.getn(routingPoints) then
+	if nextroutingpoint <= tableLength(routingPoints) then
 		local dx, dz, dist
 		repeat
 			dx=routingPoints[nextroutingpoint][1]-playerdetail.coordX
@@ -410,7 +443,7 @@ local function systemUpdate(handle)
 			dist=math.sqrt(dx*dx+dz*dz)
 			if dist<10 then
 				nextroutingpoint=nextroutingpoint+1
-				if nextroutingpoint > table.getn(routingPoints) then
+				if nextroutingpoint > tableLength(routingPoints) then
 					TomTom.setInfoWindowText("TomTom")
 					TomTom.setInfoWindowDirection("nodir")
 					TomTom.checkAutoHide()
@@ -420,14 +453,14 @@ local function systemUpdate(handle)
 			end
 		until (dist >= 10)
 		if (dirx ~= 0 or dirz ~= 0) then
-			playerDirection=180/3.14159265*math.atan2(dirz, dirx)
+			playerDirection=180/3.14159265*atan2(dirz, dirx)
 		end
-		local angle=180/3.14159265*math.atan2(dz, dx)
+		local angle=180/3.14159265*atan2(dz, dx)
 		if TomTomGlobal.relativeArrow then angle=angle-playerDirection+90 end
 		while (angle < -180) do angle=angle+360 end
 		while (angle >  180) do angle=angle-360 end
 		-- if TomTomGlobal.relativeArrow then
-			-- print ("angle= "..(180/3.14159265*math.atan2(dz, dx)) .. ", player moves "..playerDirection.." results in "..angle)
+			-- print ("angle= "..(180/3.14159265*atan2(dz, dx)) .. ", player moves "..playerDirection.." results in "..angle)
 		-- end
 		if     (angle < -169) then dir="w"
 		elseif (angle < -146) then dir="nww"
@@ -447,22 +480,37 @@ local function systemUpdate(handle)
 		elseif (angle <  169) then dir="sww"
 		else                       dir="w"
 		end
-		TomTom.setInfoWindowText(""..nextroutingpoint.."/"..table.getn(routingPoints)..": "..math.floor(dist).."m "..dir,
+		TomTom.setInfoWindowText(""..nextroutingpoint.."/"..tableLength(routingPoints)..": "..math.floor(dist).."m "..dir,
 			routingPoints[nextroutingpoint][3])
 		TomTom.setInfoWindowDirection(dir)
+		debugPrint("update #"..debugUpdateCount..": route "..nextroutingpoint.."/"..tableLength(routingPoints).." dist="..math.floor(dist).." dir="..dir)
 	else
 		TomTom.setInfoWindowText("travel speed", speed .. "m/s")
+		debugPrint("update #"..debugUpdateCount..": no active route; speed="..speed.." x="..math.floor(playerdetail.coordX).." z="..math.floor(playerdetail.coordZ))
 	end
 	crashedInUpdate = false
 end
 
+local lastUpdateError=""
+local function systemUpdate(handle)
+	local ok, err=pcall(systemUpdateCore, handle)
+	if not ok then
+		crashedInUpdate=false
+		local message=tostring(err)
+		if message~=lastUpdateError then
+			print("[TomTom error] systemUpdate failed: "..message)
+			lastUpdateError=message
+		end
+	end
+end
+
 local function usage()
-	print (L("Usage")..": tomtom mark <name> [x] [z] [comment] | forget | verbose | silent | next | prev | relative | absolute | raredar | achieves | portals | route <type> ... | goto <x> <z> | print | show | hide | autohide [on]")
+	print (L("Usage")..": tomtom mark <name> [x] [z] [comment] | forget | verbose | silent | next | prev | relative | absolute | raredar | achieves | portals | route <type> ... | goto <x> <z> | print | show | hide | autohide [on] | debug [on|off]")
 end
 
 function TomTom.checkAutoHide()
 	if TomTomChar.autohide then
-		if nextroutingpoint > table.getn(routingPoints)  then
+		if nextroutingpoint > tableLength(routingPoints)  then
 			TomTom.setUIVisibility(false)
 		else
 			TomTom.setUIVisibility(true)
@@ -584,6 +632,20 @@ function TomTom.SlashHandler(handle, args)
 			end
 		elseif r[1] == "print" then
 			printRoute()
+		elseif r[1] == "debug" then
+			if r[2] == "off" then
+				debugEnabled=false
+				print("[TomTom debug] off")
+			else
+				debugEnabled=true
+				debugNextTime=0
+				local pd=Inspect.Unit.Detail("player")
+				if pd and pd.coordX then
+					print("[TomTom debug] on: zone="..tostring(pd.zone).." x="..math.floor(pd.coordX).." z="..math.floor(pd.coordZ).." route="..nextroutingpoint.."/"..tableLength(routingPoints))
+				else
+					print("[TomTom debug] on: player coordinates unavailable")
+				end
+			end
 		elseif r[1] == "show" then
 			TomTom.setUIVisibility(true)
 		elseif r[1] == "hide" then
@@ -610,6 +672,7 @@ end
 local function addonLoaded(handle, addon) 
 	if (addon == "TomTom") then
 		TomTom.printVersion()
+		print("[TomTom] local patch "..TomTom.localPatch.." loaded. Use /tomtom debug to inspect updates.")
 		ensureVariablesInited()
 		TomTom.createUI()
 		TomTom.addFlipHandler(flip)
