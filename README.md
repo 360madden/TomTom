@@ -8,7 +8,7 @@ TomTom marks waypoint lists, builds simple in-zone routes, and shows a small arr
 | Field | Value |
 |---|---|
 | Addon identifier | `TomTom` |
-| Addon version | `0.22` |
+| Addon version | `0.22-localfix1` |
 | Original addon author | `Wym` |
 | Mirror owner | `360madden` |
 | Local mirror source | `C:\RIFT MODDING\TomTom` |
@@ -55,6 +55,7 @@ Restart Rift or reload the UI after copying the files, then enable **TomTom** in
 | `/tomtom raredar [all]` | Route to RareDar rare mob locations if RareDar is installed. |
 | `/tomtom rarenerd` | Route to RareNerd rare mob locations if RareNerd is installed. |
 | `/tomtom print` | Print the current route. |
+| `/tomtom debug` / `/tomtom debug off` | Toggle live route/update diagnostics. |
 
 ## Coordinate model
 
@@ -83,3 +84,7 @@ Example: if another tool shows `X=7424`, `Y=818`, `Z=3206`, the TomTom command i
 ## RiftReader integration
 
 RiftReader can use TomTom saved variables as waypoint seed data. TomTom waypoints provide `zone`, `x`, and `z`; imported RiftReader waypoints use a configurable/default `y` value because TomTom does not store height.
+
+## Localfix notes
+
+`0.22-localfix1` is a local maintenance build for current Rift testing. It preserves the original addon behavior while hardening the route update loop against runtime errors that could freeze the arrow after spawning, zoning, or route changes.

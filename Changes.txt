@@ -1,3 +1,11 @@
+Changes in 0.22-localfix1:
+
+Local maintenance build for modern Rift clients and RiftReader testing.
+
+- Fixed the update-loop guard typo (`crashedinUpdate` -> `crashedInUpdate`).
+- Hardened the per-frame route update with an error guard so one runtime failure does not permanently freeze the arrow.
+- Added compatibility fallbacks for `table.getn` and `math.atan2`.
+- Added `/tomtom debug` and `/tomtom debug off` for live route/update diagnostics.
 Changes in 0.07:
 
 Fixed a bug when using /tomtom raredar without RareDar installed.

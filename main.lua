@@ -7,7 +7,7 @@ end
 
 TomTom = {
 	version=TomTomAddonData.toc.Version,
-	localPatch="debug-guard-20260423"
+	localPatch="0.22-localfix1"
 }
 
 local function L(x) return Translations.TomTom.L(x) end

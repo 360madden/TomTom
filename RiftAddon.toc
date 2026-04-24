@@ -8,7 +8,7 @@ Description = {
 }
 Author = "Wym"
 Website = "none"
-Version = "0.22"
+Version = "0.22-localfix1"
 Email = "blohm@s.netic.de"
 Environment = {"2.3"}
 RunOnStartup = {
